@@ -68,6 +68,5 @@ public class Main {
         }
         multicastSocket.close();
         pointToPointSocket.close();
-        //ms.leaveGroup(adrLocale);
     }
 }

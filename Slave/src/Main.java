@@ -56,10 +56,11 @@ public class Main {
             byte[] byteRecu2 = paquet3.getData();
             for (int i = 0; i < byteRecu2.length; i++)
             {
-                valeurRecue = (valeurRecue2 << 8) + (byteRecu2[i] & 0xff);
+                valeurRecue2 = (valeurRecue2 << 8) + (byteRecu2[i] & 0xff);
             }
             System.out.println("Valeur recue : " + valeurRecue2);
             decalage = valeurRecue2 - System.currentTimeMillis();
+            System.out.println("Nouveau décalage : " + decalage);
 
             cnt++;
         }
