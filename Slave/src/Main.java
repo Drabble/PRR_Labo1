@@ -1,21 +1,21 @@
+/**
+ * Projet : Labo 1 PRR
+ * Auteur : Antoine Drabble & Simon Baehler
+ * Date : 22.09.2016
+ * Description : Master
+ */
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class Main {
-
     public static void main(String[] args) throws InterruptedException, IOException {
-        System.out.println("Hello World!");
-
         long decalage = 0;
-
-        byte[] tampon = new byte[8];
+        byte[] longTampon = new byte[8];
 
         MulticastSocket multicastSocket = new MulticastSocket(4445);
         InetAddress groupe = InetAddress.getByName("228.5.6.7");
@@ -26,9 +26,8 @@ public class Main {
         int cnt = 0;
         while (cnt < 1000) {
             // Retrieve master current time
-            DatagramPacket paquet = new DatagramPacket(tampon, tampon.length);
+            DatagramPacket paquet = new DatagramPacket(longTampon, longTampon.length);
             multicastSocket.receive(paquet);
-
             long valeurRecue = 0;
             byte[] byteRecu = paquet.getData();
             for (int i = 0; i < byteRecu.length; i++)
@@ -41,17 +40,15 @@ public class Main {
             decalage = System.currentTimeMillis() - valeurRecue;
 
             // Send new decalage
-            byte[] tampon2 = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(decalage).array();
+            longTampon = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(decalage).array();
             InetAddress address = InetAddress.getByName("127.0.0.1");
-            DatagramPacket paquet2 = new DatagramPacket(tampon2, tampon2.length, address,  4444);
+            DatagramPacket paquet2 = new DatagramPacket(longTampon, longTampon.length, address,  4444);
             pointToPointSocket.send(paquet2);
-
             System.out.println("Decalage envoye : " + decalage);
 
             // Receive new decalage
-            DatagramPacket paquet3 = new DatagramPacket(tampon, tampon.length);
+            DatagramPacket paquet3 = new DatagramPacket(longTampon, longTampon.length);
             multicastSocket.receive(paquet3);
-
             long valeurRecue2 = 0;
             byte[] byteRecu2 = paquet3.getData();
             for (int i = 0; i < byteRecu2.length; i++)
@@ -64,7 +61,6 @@ public class Main {
 
             cnt++;
         }
-
         multicastSocket.leaveGroup(groupe);
         multicastSocket.close();
         pointToPointSocket.close();
