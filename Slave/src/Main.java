@@ -14,55 +14,55 @@ import java.nio.ByteBuffer;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
-        long decalage = 0;
-        byte[] longTampon = new byte[8];
+        long shift = 0; // Current time shift
 
+        // Create the multicast socket to receive messages from the master
         MulticastSocket multicastSocket = new MulticastSocket(4445);
-        InetAddress groupe = InetAddress.getByName("228.5.6.7");
-        multicastSocket.joinGroup(groupe);
+        InetAddress multicastGroup = InetAddress.getByName("228.5.6.7");
+        multicastSocket.joinGroup(multicastGroup);
 
+        // Create point to point socket to send messages to the master
         DatagramSocket pointToPointSocket = new DatagramSocket();
 
-        int cnt = 0;
-        while (cnt < 1000) {
+        while (true) {
             // Retrieve master current time
-            DatagramPacket paquet = new DatagramPacket(longTampon, longTampon.length);
-            multicastSocket.receive(paquet);
-            long valeurRecue = 0;
-            byte[] byteRecu = paquet.getData();
-            for (int i = 0; i < byteRecu.length; i++)
+            byte[] longTampon = new byte[8];
+            DatagramPacket timePacket = new DatagramPacket(longTampon, longTampon.length);
+            multicastSocket.receive(timePacket);
+            long receivedValue = 0;
+            byte[] receivedBuffer = timePacket.getData();
+            for (int i = 0; i < receivedBuffer.length; i++)
             {
-                valeurRecue = (valeurRecue << 8) + (byteRecu[i] & 0xff);
+                receivedValue = (receivedValue << 8) + (receivedBuffer[i] & 0xff);
             }
-            System.out.println("Valeur recue : " + valeurRecue);
+            System.out.println("Received value : " + receivedValue);
 
-            // Calculate new decalage
-            decalage = System.currentTimeMillis() - valeurRecue;
+            // Calculate new shift
+            shift = System.currentTimeMillis() - receivedValue;
 
-            // Send new decalage
-            longTampon = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(decalage).array();
+            // Send new shift
+            longTampon = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(shift).array();
             InetAddress address = InetAddress.getByName("127.0.0.1");
-            DatagramPacket paquet2 = new DatagramPacket(longTampon, longTampon.length, address,  4444);
-            pointToPointSocket.send(paquet2);
-            System.out.println("Decalage envoye : " + decalage);
+            DatagramPacket shiftPacket = new DatagramPacket(longTampon, longTampon.length, address,  4444);
+            pointToPointSocket.send(shiftPacket);
+            System.out.println("Shift sent : " + shift);
 
-            // Receive new decalage
-            DatagramPacket paquet3 = new DatagramPacket(longTampon, longTampon.length);
-            multicastSocket.receive(paquet3);
-            long valeurRecue2 = 0;
-            byte[] byteRecu2 = paquet3.getData();
-            for (int i = 0; i < byteRecu2.length; i++)
+            // Receive new shift
+            DatagramPacket newShiftPacket = new DatagramPacket(longTampon, longTampon.length);
+            multicastSocket.receive(newShiftPacket);
+            receivedValue = 0;
+            receivedBuffer = newShiftPacket.getData();
+            for (int i = 0; i < receivedBuffer.length; i++)
             {
-                valeurRecue2 = (valeurRecue2 << 8) + (byteRecu2[i] & 0xff);
+                receivedValue = (receivedValue << 8) + (receivedBuffer[i] & 0xff);
             }
-            System.out.println("Valeur recue : " + valeurRecue2);
-            decalage = valeurRecue2 - System.currentTimeMillis();
-            System.out.println("Nouveau décalage : " + decalage);
-
-            cnt++;
+            System.out.println("Received value : " + receivedValue);
+            shift = receivedValue - System.currentTimeMillis();
+            System.out.println("New shift : " + shift);
         }
-        multicastSocket.leaveGroup(groupe);
-        multicastSocket.close();
-        pointToPointSocket.close();
+
+        //multicastSocket.leaveGroup(multicastGroup);
+        //multicastSocket.close();
+        //pointToPointSocket.close();
     }
 }
