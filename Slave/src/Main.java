@@ -6,10 +6,7 @@
  */
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.nio.ByteBuffer;
 
 public class Main {
@@ -19,10 +16,13 @@ public class Main {
         // Create the multicast socket to receive messages from the master
         MulticastSocket multicastSocket = new MulticastSocket(4445);
         InetAddress multicastGroup = InetAddress.getByName("228.5.6.7");
+        multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
         multicastSocket.joinGroup(multicastGroup);
 
         // Create point to point socket to send messages to the master
         DatagramSocket pointToPointSocket = new DatagramSocket();
+
+        System.out.println("Started the sockets!");
 
         while (true) {
             // Retrieve master current time
@@ -42,7 +42,7 @@ public class Main {
 
             // Send new shift
             longTampon = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(shift).array();
-            InetAddress address = InetAddress.getByName("10.192.94.152");
+            InetAddress address = InetAddress.getByName("127.0.0.1");
             DatagramPacket shiftPacket = new DatagramPacket(longTampon, longTampon.length, address,  4444);
             pointToPointSocket.send(shiftPacket);
             System.out.println("Shift sent : " + shift);

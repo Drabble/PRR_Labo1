@@ -10,10 +10,7 @@ Date result = new Date(System.currentTimeMillis());
 result = new Date(System.currentTimeMillis()+decalage);*/
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -24,6 +21,8 @@ public class Main {
         // Multicast socket to communicate with slaves
         InetAddress multicastGroup = InetAddress.getByName("228.5.6.7");
         MulticastSocket multicastSocket = new MulticastSocket(4446);
+        multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
+        multicastSocket.joinGroup(multicastGroup);
 
         // Point to point socket to receive message from slaves
         DatagramSocket pointToPointSocket = new DatagramSocket(4444);
@@ -54,6 +53,7 @@ public class Main {
 
             // Calculate maximum shift and send it
             long maxShift = Collections.max(shifts);
+            // System.currentTimeMillis ??
             longBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(maxShift + System.currentTimeMillis()).array();
             DatagramPacket maxShiftPacket = new DatagramPacket(longBuffer, longBuffer.length, multicastGroup, 4445);
             multicastSocket.send(maxShiftPacket);
@@ -63,6 +63,7 @@ public class Main {
             Thread.sleep(10000);
         }
 
+        //multicastSocket.leaveGroup(multicastGroup);
         //multicastSocket.close();
         //pointToPointSocket.close();
     }
