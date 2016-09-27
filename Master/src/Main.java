@@ -52,7 +52,7 @@ public class Main {
                 shifts.push(receivedValue);
             }
 
-            // Calculate maximum decalage and send it
+            // Calculate maximum shift and send it
             long maxShift = Collections.max(shifts);
             longBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(maxShift + System.currentTimeMillis()).array();
             DatagramPacket maxShiftPacket = new DatagramPacket(longBuffer, longBuffer.length, multicastGroup, 4445);
@@ -62,6 +62,7 @@ public class Main {
             // Wait 10 seconds
             Thread.sleep(10000);
         }
+
         //multicastSocket.close();
         //pointToPointSocket.close();
     }
