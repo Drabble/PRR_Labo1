@@ -22,7 +22,8 @@ public class Main {
         InetAddress multicastGroup = InetAddress.getByName("228.5.6.7");
         MulticastSocket multicastSocket = new MulticastSocket(4446);
         // Specify the network interface if it is not choosing the right one by default
-        multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
+        //multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
+        // Join group was not necessary on my home lan
         //multicastSocket.joinGroup(multicastGroup);
 
         // Point to point socket to receive message from slaves
