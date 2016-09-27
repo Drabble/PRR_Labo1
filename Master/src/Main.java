@@ -21,8 +21,9 @@ public class Main {
         // Multicast socket to communicate with slaves
         InetAddress multicastGroup = InetAddress.getByName("228.5.6.7");
         MulticastSocket multicastSocket = new MulticastSocket(4446);
+        // Specify the network interface if it is not choosing the right one by default
         multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
-        multicastSocket.joinGroup(multicastGroup);
+        //multicastSocket.joinGroup(multicastGroup);
 
         // Point to point socket to receive message from slaves
         DatagramSocket pointToPointSocket = new DatagramSocket(4444);

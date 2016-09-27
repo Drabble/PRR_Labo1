@@ -16,7 +16,8 @@ public class Main {
         // Create the multicast socket to receive messages from the master
         MulticastSocket multicastSocket = new MulticastSocket(4445);
         InetAddress multicastGroup = InetAddress.getByName("228.5.6.7");
-        multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
+        // Specify the network interface if it is not choosing the right one by default
+        //multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
         multicastSocket.joinGroup(multicastGroup);
 
         // Create point to point socket to send messages to the master
