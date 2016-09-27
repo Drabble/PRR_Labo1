@@ -36,8 +36,11 @@ public class Main {
             shift = System.currentTimeMillis() - receivedValue;
 
             // Send new shift
+
             longTampon = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(shift).array();
-            InetAddress address = InetAddress.getByName("10.192.94.152");
+
+            //String s = timePacket.getAddress().getHostAddress();
+            InetAddress address = InetAddress.getByName(timePacket.getAddress().getHostAddress());
             DatagramPacket shiftPacket = new DatagramPacket(longTampon, longTampon.length, address,  4444);
             pointToPointSocket.send(shiftPacket);
             System.out.println("Shift sent : " + shift);
