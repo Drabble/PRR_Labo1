@@ -42,7 +42,7 @@ public class Main {
 
             // Send new shift
             longTampon = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(shift).array();
-            InetAddress address = InetAddress.getByName("127.0.0.1");
+            InetAddress address = InetAddress.getByName("10.192.94.152");
             DatagramPacket shiftPacket = new DatagramPacket(longTampon, longTampon.length, address,  4444);
             pointToPointSocket.send(shiftPacket);
             System.out.println("Shift sent : " + shift);
