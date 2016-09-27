@@ -29,12 +29,7 @@ public class Main {
             byte[] longTampon = new byte[8];
             DatagramPacket timePacket = new DatagramPacket(longTampon, longTampon.length);
             multicastSocket.receive(timePacket);
-            long receivedValue = 0;
-            byte[] receivedBuffer = timePacket.getData();
-            for (int i = 0; i < receivedBuffer.length; i++)
-            {
-                receivedValue = (receivedValue << 8) + (receivedBuffer[i] & 0xff);
-            }
+            long receivedValue =  bytesToLong(timePacket.getData());
             System.out.println("Received value : " + receivedValue);
 
             // Calculate new shift
@@ -50,19 +45,21 @@ public class Main {
             // Receive new shift
             DatagramPacket newShiftPacket = new DatagramPacket(longTampon, longTampon.length);
             multicastSocket.receive(newShiftPacket);
-            receivedValue = 0;
-            receivedBuffer = newShiftPacket.getData();
-            for (int i = 0; i < receivedBuffer.length; i++)
-            {
-                receivedValue = (receivedValue << 8) + (receivedBuffer[i] & 0xff);
-            }
-            System.out.println("Received value : " + receivedValue);
-            shift = receivedValue - System.currentTimeMillis();
+            shift = bytesToLong(newShiftPacket.getData()) - System.currentTimeMillis();
             System.out.println("New shift : " + shift);
         }
 
         //multicastSocket.leaveGroup(multicastGroup);
         //multicastSocket.close();
         //pointToPointSocket.close();
+    }
+
+    private static long bytesToLong(byte[] bytes){
+        long result = 0;
+        for (int i = 0; i < bytes.length; i++)
+        {
+            result = (result << 8) + (bytes[i] & 0xff);
+        }
+        return result;
     }
 }

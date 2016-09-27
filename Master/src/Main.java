@@ -41,12 +41,7 @@ public class Main {
                 longBuffer = new byte[8];
                 DatagramPacket shiftPacket = new DatagramPacket(longBuffer, longBuffer.length);
                 pointToPointSocket.receive(shiftPacket);
-                long receivedValue = 0;
-                byte[] receivedBuffer = shiftPacket.getData();
-                for (int j = 0; j < receivedBuffer.length; j++)
-                {
-                    receivedValue = (receivedValue << 8) + (receivedBuffer[j] & 0xff);
-                }
+                long receivedValue = bytesToLong(shiftPacket.getData());
                 System.out.println("Shift received : " + receivedValue);
                 shifts.push(receivedValue);
             }
@@ -66,5 +61,15 @@ public class Main {
         //multicastSocket.leaveGroup(multicastGroup);
         //multicastSocket.close();
         //pointToPointSocket.close();
+    }
+
+
+    private static long bytesToLong(byte[] bytes){
+        long result = 0;
+        for (int i = 0; i < bytes.length; i++)
+        {
+            result = (result << 8) + (bytes[i] & 0xff);
+        }
+        return result;
     }
 }
