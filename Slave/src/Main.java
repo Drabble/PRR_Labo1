@@ -17,7 +17,7 @@ public class Main {
         MulticastSocket multicastSocket = new MulticastSocket(4445);
         InetAddress multicastGroup = InetAddress.getByName("228.5.6.7");
         // Specify the network interface if it is not choosing the right one by default
-        //multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
+        multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
         multicastSocket.joinGroup(multicastGroup);
 
         // Create point to point socket to send messages to the master
@@ -34,7 +34,8 @@ public class Main {
             System.out.println("Received value : " + receivedValue);
 
             // Calculate new shift
-            shift = System.currentTimeMillis() - receivedValue;
+            long currentTime = System.currentTimeMillis();
+            shift = currentTime - receivedValue;
 
             // Send new shift
 
@@ -49,7 +50,7 @@ public class Main {
             // Receive new shift
             DatagramPacket newShiftPacket = new DatagramPacket(longTampon, longTampon.length);
             multicastSocket.receive(newShiftPacket);
-            shift = bytesToLong(newShiftPacket.getData()) - System.currentTimeMillis();
+            shift = bytesToLong(newShiftPacket.getData()) - currentTime;
             System.out.println("New shift : " + shift);
         }
 

@@ -22,7 +22,7 @@ public class Main {
         InetAddress multicastGroup = InetAddress.getByName("228.5.6.7");
         MulticastSocket multicastSocket = new MulticastSocket(4446);
         // Specify the network interface if it is not choosing the right one by default
-        //multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
+        multicastSocket.setNetworkInterface(NetworkInterface.getByName("wlan0"));
         // Join group was not necessary on my home lan
         //multicastSocket.joinGroup(multicastGroup);
 
@@ -50,8 +50,7 @@ public class Main {
 
             // Calculate maximum shift and send it
             long maxShift = Collections.max(shifts);
-            // System.currentTimeMillis ??
-            longBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(maxShift + System.currentTimeMillis()).array();
+            longBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(maxShift + currentTime).array();
             DatagramPacket maxShiftPacket = new DatagramPacket(longBuffer, longBuffer.length, multicastGroup, 4445);
             multicastSocket.send(maxShiftPacket);
             System.out.println("Max shift received : " + maxShift);
