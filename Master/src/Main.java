@@ -5,13 +5,10 @@
  * Description : Slave
  */
 
-/*SimpleDateFormat sdf = new SimpleDateFormat("MM dd, yyyy HH:mm");
-Date result = new Date(System.currentTimeMillis());
-result = new Date(System.currentTimeMillis()+decalage);*/
-
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Main {
@@ -29,13 +26,16 @@ public class Main {
         // Point to point socket to receive message from slaves
         DatagramSocket pointToPointSocket = new DatagramSocket(4444);
 
+        // Date fo
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+
         while (true) {
             // Retrieve the current time and send it on the multicast
             long currentTime = System.currentTimeMillis();
             byte[] longBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(currentTime).array();
             DatagramPacket timePacket = new DatagramPacket(longBuffer, longBuffer.length, multicastGroup, 4445);
             multicastSocket.send(timePacket);
-            System.out.println("Current time sent : " + currentTime);
+            System.out.println("Current time sent : " + sdf.format(new Date(currentTime)));
 
             // Receive every response from the slaves
             LinkedList<Long> shifts = new LinkedList<Long>();
@@ -44,7 +44,7 @@ public class Main {
                 DatagramPacket shiftPacket = new DatagramPacket(longBuffer, longBuffer.length);
                 pointToPointSocket.receive(shiftPacket);
                 long receivedValue = bytesToLong(shiftPacket.getData());
-                System.out.println("Shift received : " + receivedValue);
+                System.out.println("Shift received : " + receivedValue + " ms");
                 shifts.push(receivedValue);
             }
 
@@ -53,7 +53,7 @@ public class Main {
             longBuffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(maxShift + currentTime).array();
             DatagramPacket maxShiftPacket = new DatagramPacket(longBuffer, longBuffer.length, multicastGroup, 4445);
             multicastSocket.send(maxShiftPacket);
-            System.out.println("Max shift received : " + maxShift);
+            System.out.println("Max shift sent : " + maxShift + " ms");
 
             // Wait 10 seconds
             Thread.sleep(10000);

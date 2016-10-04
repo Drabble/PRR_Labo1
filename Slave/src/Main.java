@@ -8,6 +8,8 @@
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -23,6 +25,8 @@ public class Main {
         // Create point to point socket to send messages to the master
         DatagramSocket pointToPointSocket = new DatagramSocket();
 
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+
         System.out.println("Started the sockets!");
 
         while (true) {
@@ -31,7 +35,7 @@ public class Main {
             DatagramPacket timePacket = new DatagramPacket(longTampon, longTampon.length);
             multicastSocket.receive(timePacket);
             long receivedValue =  bytesToLong(timePacket.getData());
-            System.out.println("Received value : " + receivedValue);
+            System.out.println("Received master time : " + sdf.format(new Date(receivedValue)));
 
             // Calculate new shift
             long currentTime = System.currentTimeMillis();
@@ -45,13 +49,13 @@ public class Main {
             InetAddress address = InetAddress.getByName(timePacket.getAddress().getHostAddress());
             DatagramPacket shiftPacket = new DatagramPacket(longTampon, longTampon.length, address,  4444);
             pointToPointSocket.send(shiftPacket);
-            System.out.println("Shift sent : " + shift);
+            System.out.println("Shift sent : " + shift + " ms");
 
             // Receive new shift
             DatagramPacket newShiftPacket = new DatagramPacket(longTampon, longTampon.length);
             multicastSocket.receive(newShiftPacket);
             shift = bytesToLong(newShiftPacket.getData()) - currentTime;
-            System.out.println("New shift : " + shift);
+            System.out.println("New shift received : " + shift + " ms");
         }
 
         //multicastSocket.leaveGroup(multicastGroup);
