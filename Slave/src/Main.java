@@ -4,8 +4,9 @@
  * Date : 22.09.2016
  * Description : Slave
  *
- * This program receive the demand of the master to send him its time after that he receive the max value of all salves
- * who subscribed to the master then he set its time to this value (master time + shift max ) - salve time
+ * This program receives the current time of the master then sends its clock shift with the master time.
+ * He will then receive the max shift between all the slaves and set its time to this value :
+ *      (master time + shift max ) - slave time
  */
 
 import java.io.IOException;
@@ -14,7 +15,21 @@ import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Main class which starts a master
+ *
+ * @author : Antoine Drabble & Simon Baehler
+ * @date 22.09.2016
+ */
 public class Main {
+
+    /**
+     * Starts a master
+     *
+     * @param args
+     * @throws InterruptedException
+     * @throws IOException
+     */
     public static void main(String[] args) throws InterruptedException, IOException {
         long shift = 0; // Current time shift
 
@@ -26,8 +41,11 @@ public class Main {
         // Create the multicast socket to receive messages from the master
         MulticastSocket multicastSocket = new MulticastSocket(multicastPort);
         InetAddress multicastGroup = InetAddress.getByName(multicastAddress);
+
         // Specify the network interface if it is not choosing the right one by default
-        multicastSocket.setNetworkInterface(NetworkInterface.getByName(networkInterface));
+        //multicastSocket.setNetworkInterface(NetworkInterface.getByName(networkInterface));
+
+        // Join the multicast group
         multicastSocket.joinGroup(multicastGroup);
 
         // Create point to point socket to send messages to the master
@@ -67,12 +85,12 @@ public class Main {
     }
 
     /**
-     * name : bytesToLong
-     * Author : Antoine Drabble & Simon Baehler
-     * Date : 22.09.2016
-     * Description : transforme a data of bytes to a long
-     * param : byte[] bytes - data of bytes
-     * out : long - value of the data of bytes in a long format
+     * Transforms a data of bytes to a long
+     *
+     * @author : Antoine Drabble & Simon Baehler
+     * @date 22.09.2016
+     * @param bytes - data of bytes
+     * @return long - value of the data of bytes in a long format
      */
     private static long bytesToLong(byte[] bytes){
         long result = 0;

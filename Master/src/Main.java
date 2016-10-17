@@ -3,14 +3,24 @@
  * Author : Antoine Drabble & Simon Baehler
  * Date : 22.09.2016
  * Description : Master
- * This program play the role of the master, each 10 second the master demand the time of it subscribers between the
- * master time and the subscriber time. After that he found the bigest value and send it to the salves (the value is
- * not absolute, we only want to go forward in the time)
+ * This program plays the role of the master. Each 10 seconds, the master will send its current time to the slaves
+ * on a UDP multicast socket. The slave will be listening to the multicast address and receive the master's current
+ * time. They will then send their time shift so the master can calculate the maximum shift between the slaves (the value
+ * is not absolute, we only want to go forward in the time). Finally the master will send the maximum shift to the
+ * slaves and they will synchronise their clock.
  *
- * Test : We ran the program at local, on only on computer : it works well
- *        We ran the program on two different t computers at school : unfortunately it didn't work, the packet was
- *        send but lose in the space (we observed it with wireshark). We also notice if we launch a slave on
- *        the master it's works well.
+ * Test : We ran the master and slave on localhost, on only one computer : it works well
+ *        We ran one master and one slave on two different computers at school : At first it didn't work, the packet was
+ *        sent but lost in the space (we observed it with wireshark). We then noticed that if we launched an additional slave on
+ *        the same computer as the master, it worked well. This is probably due to some strange configuration
+ *        on the HEIG lan.
+ *        We ran the master and the slave on two different computer on a home lan : it works well
+ *
+ * Running the program : You must fist set the number of slaves you want to use.
+ *                       If the program doesn't use the correct network interface, you have to uncomment
+ *                       the line with "setNetworkInterface" and specify the interface in the networkInterface constant.
+ *                       Finally you have to first start all the slaves and finally you can start the master. The
+ *                       synchronisation will occure every 10 seconds.
  */
 
 import java.io.IOException;
@@ -19,7 +29,21 @@ import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Main class which starts a master
+ *
+ * @author : Antoine Drabble & Simon Baehler
+ * @date 22.09.2016
+ */
 public class Main {
+
+    /**
+     * Starts a master
+     *
+     * @param args
+     * @throws InterruptedException
+     * @throws IOException
+     */
     public static void main(String[] args) throws InterruptedException, IOException {
         int nbSlaves = 1; // Number of slaves to synchronise
         final String multicastAddress = "228.5.6.7";
@@ -31,8 +55,10 @@ public class Main {
         // Multicast socket to communicate with slaves
         InetAddress multicastGroup = InetAddress.getByName(multicastAddress);
         MulticastSocket multicastSocket = new MulticastSocket(multicastPort);
+
         // Specify the network interface if it is not choosing the right one by default
-        multicastSocket.setNetworkInterface(NetworkInterface.getByName(networkInterface));
+       // multicastSocket.setNetworkInterface(NetworkInterface.getByName(networkInterface));
+
         // Join group was not necessary on my home lan
         //multicastSocket.joinGroup(multicastGroup);
 
@@ -78,12 +104,12 @@ public class Main {
     }
 
     /**
-     * name : bytesToLong
-     * Author : Antoine Drabble & Simon Baehler
-     * Date : 22.09.2016
-     * Description : transforme a data of bytes to a long
-     * param : byte[] bytes - data of bytes
-     * out : long - value of the data of bytes in a long format
+     * Transforms a data of bytes to a long
+     *
+     * @author : Antoine Drabble & Simon Baehler
+     * @date 22.09.2016
+     * @param bytes - data of bytes
+     * @return long - value of the data of bytes in a long format
      */
     private static long bytesToLong(byte[] bytes){
         long result = 0;
