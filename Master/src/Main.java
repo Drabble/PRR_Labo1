@@ -6,6 +6,11 @@
  * This program play the role of the master, each 10 second the master demand the time of it subscribers between the
  * master time and the subscriber time. After that he found the bigest value and send it to the salves (the value is
  * not absolute, we only want to go forward in the time)
+ *
+ * Test : We ran the program at local, on only on computer : it works well
+ *        We ran the program on two different t computers at school : unfortunately it didn't work, the packet was
+ *        send but lose in the space (we observed it with wireshark). We also notice if we launch a slave on
+ *        the master it's works well.
  */
 
 import java.io.IOException;
